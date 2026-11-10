@@ -1,4 +1,4 @@
-﻿# OS
+# OS
 .DS_Store
 Thumbs.db
 
@@ -30,3 +30,22 @@ backend/target/
 .env
 .env.*
 !.env.example
+
+# Dépendances / build (tous niveaux)
+node_modules/
+dist/
+target/
+build/
+out/
+*.class
+*.jar
+
+# Bases H2 de dev + uploads
+*.mv.db
+*.trace.db
+*.h2.db
+backend/data/
+uploads/
+
+# Secrets
+application-local.properties

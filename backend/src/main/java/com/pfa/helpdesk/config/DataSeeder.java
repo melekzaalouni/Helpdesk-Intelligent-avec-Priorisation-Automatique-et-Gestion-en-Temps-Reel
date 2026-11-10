@@ -7,12 +7,16 @@ import com.pfa.helpdesk.entity.enums.Specialty;
 import com.pfa.helpdesk.repository.CategoryRepository;
 import com.pfa.helpdesk.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/** Comptes de démonstration : actifs uniquement avec le profil Spring "dev". */
+@Profile("dev")
 @Component
 @RequiredArgsConstructor
 public class DataSeeder implements CommandLineRunner {
@@ -21,15 +25,21 @@ public class DataSeeder implements CommandLineRunner {
     private final CategoryRepository categoryRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${DEMO_PASSWORD:#{null}}")
+    private String demoPassword;
+
     @Override
     public void run(String... args) throws Exception {
+        if (demoPassword == null || demoPassword.length() < 8) {
+            throw new IllegalStateException("Profil dev : définir DEMO_PASSWORD (8 caractères minimum).");
+        }
         // 1. Ajouter l'Admin par défaut
         if (!userRepository.existsByEmail("admin@helpdesk.com")) {
             userRepository.save(User.builder()
                     .firstName("Admin")
                     .lastName("Super")
                     .email("admin@helpdesk.com")
-                    .password(passwordEncoder.encode("***REMOVED***"))
+                    .password(passwordEncoder.encode(demoPassword))
                     .role(Role.ADMIN)
                     .enabled(true)
                     .build());
@@ -41,7 +51,7 @@ public class DataSeeder implements CommandLineRunner {
                     .firstName("Bob")
                     .lastName("Le Technicien")
                     .email("tech@helpdesk.com")
-                    .password(passwordEncoder.encode("***REMOVED***"))
+                    .password(passwordEncoder.encode(demoPassword))
                     .role(Role.TECHNICIEN)
                     .specialty(Specialty.RESEAU)
                     .enabled(true)
